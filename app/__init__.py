@@ -2,6 +2,8 @@ import os
 
 from flask import (Flask, render_template, request, redirect, send_file, url_for)
 
+from . import imgProcessing as ip
+
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
@@ -31,12 +33,20 @@ def create_app(test_config=None):
                 options = request.form["options"]
                 image = request.files["image"]
                 path = os.path.join(app.config["IMAGE_UPLOADS"], image.filename)
-                print(options)
-                print(path)
-                print(image)
                 image.save(path)
-                return redirect(url_for('index'))
+                return redirect(url_for('download', img=image.filename, options=options))
 
         return render_template('/index.html')
+    
+    @app.route('/download/<img>/<options>', methods=['GET', 'POST'])
+    def download(img, options):
+        path = os.path.join(app.config["IMAGE_UPLOADS"], img)
+        ip.processCheckedOptions(path, options)
+        return render_template('/download.html', img=img)
+
+    @app.route('/download_file/<img>')
+    def download_file(img):
+        image = os.path.join(app.config["IMAGE_UPLOADS"], img)
+        return send_file(image, as_attachment=True) 
 
     return app
