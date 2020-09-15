@@ -1,71 +1,135 @@
+
+
 <style>
-    li {
-      display: inline-block;
-      padding-right:8px;
-    }
-  </style>
-  
-  <form action="/" method="POST" enctype="multipart/form-data">
-  
-      <div class="form-group">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" name="image" id="image" required>
+  .label-text {
+    font-size:10pt; margin-top:6px
+  }
+</style>
+
+<div class="container-fluid text-center">
+
+  <form action="/" method="POST" role="form" enctype="multipart/form-data">
+    <div class="form-group">
+
+      <div class="row justify-content-center">
+        <div class="input-group my-3 col-3">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="image" name="image" onchange="handleUpload(this)" required>
+            <label class="custom-file-label text-left" for="image" id="custom-file-label">Selecione a image...</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row justify-content-center">
+        <div class="text-center mb-2">
+          <span style="font-weight: bold;">Opções de processamento</span>
+        </div>
+
+        <div class="col-sm-6 col-lg-12 mb-3">
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="flip_horizontal" id="flip_horizontal" onclick="handleClick(this)">
+            <label for="flip_horizontal" class="label-text">Flip Horizontal</label>
+          </div>
+    
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="flip_vertical" id="flip_vertical" onclick="handleClick(this)">
+            <label for="flip_vertical" class="label-text">Flip Vertical</label>
+          </div>
+    
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="invert_colors" id="invert_colors" onclick="handleClick(this)">
+                  <label for="invert_colors" class="label-text">Inverter cores (negativo)</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="blur" id="blur" onclick="handleClick(this)">
+            <label for="blur" class="label-text">Blur (borrar imagem)</label>
+          </div>
+    
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="edge_detect" id="edge_detect" onclick="handleClick(this)">
+            <label for="edge_detect" class="label-text">Detecção arestas</label>
+          </div>
+    
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="draw_contours" id="draw_contours" onclick="handleClick(this)">
+            <label for="draw_contours" class="label-text">Desenhar Contornos</label>
+          </div>
+
         </div>
   
-        <ul style="list-style-type: none;">
-          <li>
-            <input type="checkbox" name="flip_horizontal" id="flip_horizontal" onclick="handleClick(this)">
-            <label for="flip_horizontal">Flip Horizontal</label>
-          </li>
-          <li>
-            <input type="checkbox" name="flip_vertical" id="flip_vertical" onclick="handleClick(this)">
-            <label for="flip_vertical">Flip Vertical</label>
-          </li>
-          <li>
-            <input type="checkbox" name="invert_colors" id="invert_colors" onclick="handleClick(this)">
-            <label for="invert_colors">Inverter cores (negativo)</label>
-          </li>
-          <li>
-            <input type="checkbox" name="blur" id="blur" onclick="handleClick(this)">
-            <label for="blur">Blur (borrar imagem)</label>
-          </li>
-          <li>
-            <input type="checkbox" name="edge_detect" id="edge_detect" onclick="handleClick(this)">
-            <label for="edge_detect">Detecção arestas</label>
-          </li>
-          <li>
-            <input type="checkbox" name="draw_contours" id="draw_contours" onclick="handleClick(this)">
-            <label for="draw_contours">Desenhar Contornos</label>
-          </li>
-        </ul>
-  
-        <input type="hidden" name="options" id="options">
-  
-      </div>
+      </div>  
+      
+      <div><ul id="processing-order"></ul></div>
+
+      <input type="hidden" name="options" id="options">
   
       <button type="submit" class="btn btn-primary">Enviar</button>
   
-    </form>
+    </div>
+
+  </form> 
+</div>
+
+<script>
+  const imageLabel = document.getElementById('custom-file-label')
+
+  const options = document.getElementById('options')
+  options.value = ''
   
-    <script>
-      const options = document.getElementById('options')
-      options.value = ''
+  let optionsArray = []
   
-      let optionsArray = []
-    </script>
+  const processingOrder = document.getElementById('processing-order')
   
-    <script>
-      const handleClick = (e) => {
-        let input = document.getElementById(e.id)
-        if(e.checked && !optionsArray.includes(e.name)){
-          optionsArray.push(e.name)
-        }else if(!e.checked && optionsArray.includes(e.name)){
-          optionsArray = optionsArray.filter((val) => {
-             return val != e.name
-          })
-        }
-        options.value = optionsArray.toString().replaceAll(',','#')
-        //console.log(options.value)
-      }
-    </script>
+    
+</script>
+
+<script>
+  const handleProcessingOrderMessage = () =>{
+    const dict = {
+      flip_horizontal:'Flip Horizontal',
+      flip_vertical:'Flip Vertical',
+      invert_colors:'Inventer cores (negativo)',
+      blur:'Blur (borrar imagem)',
+      edge_detect:'Detecção arestas',
+      draw_contours:'Desenhar Contornos',
+    }
+
+    while (processingOrder.firstChild) {
+      processingOrder.firstChild.remove()
+    }
+    let orderLabel = document.createElement('div')
+    orderLabel.style.display = 'inline'
+    orderLabel.style.fontSize = '9.5pt'
+    orderLabel.innerHTML = '<span style="font-weight:bold; color: #aaa">Ordem de processamento: </span>'
+    processingOrder.appendChild(orderLabel)
+
+    optionsArray.forEach((option, index) => {
+      let text = document.createElement('span')
+      text.style.fontStyle = 'italic'
+      text.style.fontSize = '9.5pt'
+      text.innerHTML = `<span style="color:blue; font-weight:bold">${index+1}</span>`+ '.' + dict[option] + '   '
+      processingOrder.appendChild(text)
+    })
+  }
+
+  const handleClick = (e) => {
+    let input = document.getElementById(e.id)
+    if(e.checked && !optionsArray.includes(e.name)){
+      optionsArray.push(e.name)
+    }else if(!e.checked && optionsArray.includes(e.name)){
+      optionsArray = optionsArray.filter((val) => {
+          return val != e.name
+      })
+    }
+    options.value = optionsArray.toString().replaceAll(',','#')
+    handleProcessingOrderMessage()
+  }
+
+  const handleUpload = (e) => {
+    let path = e.value.split("\\")
+    imageLabel.textContent = path[path.length - 1]
+  }
+</script>
     

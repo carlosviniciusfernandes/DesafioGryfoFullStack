@@ -28,7 +28,6 @@ def create_app(test_config=None):
     def index():
         
         if request.method == 'POST':
-
             if request.files:
                 options = request.form["options"]
                 image = request.files["image"]
