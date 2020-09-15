@@ -1,0 +1,71 @@
+<style>
+    li {
+      display: inline-block;
+      padding-right:8px;
+    }
+  </style>
+  
+  <form action="/" method="POST" enctype="multipart/form-data">
+  
+      <div class="form-group">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" name="image" id="image" required>
+        </div>
+  
+        <ul style="list-style-type: none;">
+          <li>
+            <input type="checkbox" name="flip_horizontal" id="flip_horizontal" onclick="handleClick(this)">
+            <label for="flip_horizontal">Flip Horizontal</label>
+          </li>
+          <li>
+            <input type="checkbox" name="flip_vertical" id="flip_vertical" onclick="handleClick(this)">
+            <label for="flip_vertical">Flip Vertical</label>
+          </li>
+          <li>
+            <input type="checkbox" name="invert_colors" id="invert_colors" onclick="handleClick(this)">
+            <label for="invert_colors">Inverter cores (negativo)</label>
+          </li>
+          <li>
+            <input type="checkbox" name="blur" id="blur" onclick="handleClick(this)">
+            <label for="blur">Blur (borrar imagem)</label>
+          </li>
+          <li>
+            <input type="checkbox" name="edge_detect" id="edge_detect" onclick="handleClick(this)">
+            <label for="edge_detect">Detecção arestas</label>
+          </li>
+          <li>
+            <input type="checkbox" name="draw_contours" id="draw_contours" onclick="handleClick(this)">
+            <label for="draw_contours">Desenhar Contornos</label>
+          </li>
+        </ul>
+  
+        <input type="hidden" name="options" id="options">
+  
+      </div>
+  
+      <button type="submit" class="btn btn-primary">Enviar</button>
+  
+    </form>
+  
+    <script>
+      const options = document.getElementById('options')
+      options.value = ''
+  
+      let optionsArray = []
+    </script>
+  
+    <script>
+      const handleClick = (e) => {
+        let input = document.getElementById(e.id)
+        if(e.checked && !optionsArray.includes(e.name)){
+          optionsArray.push(e.name)
+        }else if(!e.checked && optionsArray.includes(e.name)){
+          optionsArray = optionsArray.filter((val) => {
+             return val != e.name
+          })
+        }
+        options.value = optionsArray.toString().replaceAll(',','#')
+        //console.log(options.value)
+      }
+    </script>
+    
